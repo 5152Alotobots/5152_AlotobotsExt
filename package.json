@@ -1,0 +1,15 @@
+{
+  "name": "tt151extpack",
+  "displayName": "tt151extpack",
+  "description": "VSCode extensions needed to use the robot-template",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.76.0"
+  },
+  "categories": [
+    "Extension Packs"
+  ],
+  "extensionPack": [ 
+    "publisher.extensionName"
+  ]
+}
