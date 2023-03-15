@@ -1,14 +1,32 @@
 {
   "name": "tt151extpack",
-  "displayName": "tt151extpack",
+  "displayName": "FIRST Robotics Team 151 Extension Pack",
   "description": "VSCode extensions needed to use the robot-template",
   "publisher": "tt151",
+  "author": {
+    "name": "Brian Utterback",
+    "email": "brian@utterback.org"
+  },
+  "license": "MIT",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ToughTechs151/tt151extpack"
+  },
   "version": "0.0.1",
   "engines": {
     "vscode": "^1.76.0"
   },
   "categories": [
     "Extension Packs"
+  ],
+  "keywords": [
+    "FIRST",
+    "frc",
+    "ToughTechs",
+    "frc151",
+    "robot-template",
+    "robotics"
   ],
   "extensionPack": [ 
     "shengchen.vscode-checkstyle",
