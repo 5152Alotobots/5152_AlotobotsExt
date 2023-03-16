@@ -1,42 +1,48 @@
 name: Build and Release
+name: Release
 
-# on:
-#   push:
-#     branches:
-#       - main
 on:
-  workflow_dispatch
-  name: Build and Release Extension
-
-env:
-  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+      - 'beta*.*.*'
+  workflow_dispatch:
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16.x'
+
       - name: Install dependencies
         run: npm ci
+
       - name: Build extension
         run: npm run build
-      - name: Get current version
-        id: get_version
-        run: echo ::set-output name=version::$(npm version | grep -o -E "\b([0-9]{1,}\.)+[0-9]{1,}\b")
-      - name: Get previous release
-        id: get_previous_release
-        uses: peter-evans/get-previous-release@v1
-        with:
-          tag: ${{ steps.get_version.outputs.version }}
-          include_prereleases: true
-      - name: Increment micro version
-        id: increment_micro_version
-        run: echo ::set-output name=micro_version::$(echo ${{ steps.get_previous_release.outputs.tag }} | sed 's/^[^.]*\.\([^.]*\)\.[^.]*$/\1/'; echo $(expr ${{ steps.get_previous_release.outputs.release_count }} + 1))
+
+      - name: Determine version
+        id: determine_version
+        env:
+          GITHUB_REF: ${{ github.ref }}
+        run: |
+          if [[ $GITHUB_REF == refs/tags/v*.*.* ]]; then
+            echo "::set-output name=version::$(node -p -e "const version = require('./package.json').version.split('.'); console.log(version[0] + '.' + version[1] + '.' + (Number(version[2]) + Number('${{ github.run_number }}')));")"
+          else
+            echo "::set-output name=version::$(node -p -e "const version = require('./package.json').version.split('.'); console.log(version[0] + '.' + version[1] + '-beta.' + (Number(version[2]) + Number('${{ github.run_number }}')));")"
+          fi
+
       - name: Create release
-        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/v') }}
         id: create_release
-        uses: actions/create-release@v1
+        uses: actions/create-release@v1.0.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
@@ -44,40 +50,25 @@ jobs:
           release_name: Release ${{ github.ref }}
           body: |
             Changes in this release:
-            - Add your changes here
+            - Add a summary of the changes in your release
           draft: false
-          prerelease: false
-      - name: Create prerelease
-        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/beta/') }}
-        id: create_prerelease
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          prerelease: ${{ github.ref == 'refs/tags/beta*.*.*' }}
+
+      - name: Upload extension
+        uses: actions/upload-artifact@v2
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Prerelease ${{ github.ref }}
-          body: |
-            Changes in this prerelease:
-            - Add your changes here
-          draft: false
-          prerelease: true
-      - name: Upload release assets
-        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/v') }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./path/to/extension.vsix
-          asset_name: extension.vsix
-          asset_content_type: application/octet-stream
-      - name: Upload prerelease assets
-        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/beta/') }}
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
-          asset_path: ./path/to/extension.vsix
-          asset_name: extension.vsix
-          asset_content_type: application/octet-stream
+          name: tt151extpack
+          path: ./tt151extpack-*.vsix
+          if: success()
+
+      - name: Set output version
+        id: version
+        run: echo ::set-output name=version::${{ steps.determine_version.outputs.version }}
+
+      - name: Set output asset_url
+        id: asset_url
+        run: echo ::set-output name=asset_url::$(jq -r '.url' ${{ steps.create_release.outputs.upload_url }}/assets)
+
+      - name: Set output asset_id
+        id: asset_id
+        run: echo ::set-output name=asset_id::$(jq -r '.id' ${{ steps.create_release.outputs.upload_url }}/assets)
