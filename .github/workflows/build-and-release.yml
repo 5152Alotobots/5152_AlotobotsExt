@@ -34,6 +34,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node${{ env.NODEJS_TOOL_VERSION }}-
 
+      - name: Install vsce
+        run: npm install -g vsce
+
       - name: Install dependencies
         if: steps.cache-modules.outputs.cache-hit != 'true'
         run: npm ci
