@@ -1,0 +1,58 @@
+name: Build and Release
+
+# on:
+#   push:
+#     branches:
+#       - main
+on:
+  workflow_dispatch
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      - name: Install dependencies
+        run: npm install
+      - name: Build extension
+        run: npm run build
+      - name: Get current version
+        id: get_version
+        run: echo ::set-output name=version::$(npm version | grep -o -E "\b([0-9]{1,}\.)+[0-9]{1,}\b")
+      - name: Get previous release
+        id: get_previous_release
+        uses: peter-evans/get-previous-release@v1
+        with:
+          tag: ${{ steps.get_version.outputs.version }}
+          include_prereleases: false
+      - name: Increment micro version
+        id: increment_micro_version
+        run: echo ::set-output name=micro_version::$(echo ${{ steps.get_previous_release.outputs.tag }} | sed 's/^[^.]*\.\([^.]*\)\.[^.]*$/\1/'; echo $(expr ${{ steps.get_previous_release.outputs.release_count }} + 1))
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v$(node -p "const semver = require('semver'); const { major, minor } = semver.parse(process.env.VERSION); const micro = process.env.MICRO_VERSION; semver.inc(process.env.VERSION, 'build', micro)")
+          release_name: Release v$(node -p "require('./package.json').version")
+          body: |
+            Changes in this release:
+            - Add your changes here
+          draft: false
+          prerelease: false
+      - name: Upload release assets
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./path/to/extension.vsix
+          asset_name: extension.vsix
+          asset_content_type: application/octet-stream
+
