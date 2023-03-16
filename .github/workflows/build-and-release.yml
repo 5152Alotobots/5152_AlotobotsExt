@@ -6,19 +6,19 @@ name: Build and Release
 #       - main
 on:
   workflow_dispatch
+  name: Build and Release Extension
+
+env:
+  NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
 
 jobs:
-  build-and-release:
+  build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Setup Node.js environment
-        uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Build extension
         run: npm run build
       - name: Get current version
@@ -29,24 +29,40 @@ jobs:
         uses: peter-evans/get-previous-release@v1
         with:
           tag: ${{ steps.get_version.outputs.version }}
-          include_prereleases: false
+          include_prereleases: true
       - name: Increment micro version
         id: increment_micro_version
         run: echo ::set-output name=micro_version::$(echo ${{ steps.get_previous_release.outputs.tag }} | sed 's/^[^.]*\.\([^.]*\)\.[^.]*$/\1/'; echo $(expr ${{ steps.get_previous_release.outputs.release_count }} + 1))
       - name: Create release
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/v') }}
         id: create_release
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: v$(node -p "const semver = require('semver'); const { major, minor } = semver.parse(process.env.VERSION); const micro = process.env.MICRO_VERSION; semver.inc(process.env.VERSION, 'build', micro)")
-          release_name: Release v$(node -p "require('./package.json').version")
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
           body: |
             Changes in this release:
             - Add your changes here
           draft: false
           prerelease: false
+      - name: Create prerelease
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/beta/') }}
+        id: create_prerelease
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Prerelease ${{ github.ref }}
+          body: |
+            Changes in this prerelease:
+            - Add your changes here
+          draft: false
+          prerelease: true
       - name: Upload release assets
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/v') }}
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -55,4 +71,13 @@ jobs:
           asset_path: ./path/to/extension.vsix
           asset_name: extension.vsix
           asset_content_type: application/octet-stream
-
+      - name: Upload prerelease assets
+        if: ${{ github.event_name == 'push' && contains(github.ref, 'refs/tags/beta/') }}
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_prerelease.outputs.upload_url }}
+          asset_path: ./path/to/extension.vsix
+          asset_name: extension.vsix
+          asset_content_type: application/octet-stream
