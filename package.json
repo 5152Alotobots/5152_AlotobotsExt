@@ -13,7 +13,7 @@
     "type": "git",
     "url": "https://github.com/ToughTechs151/tt151extpack"
   },
-  "version": "0.0.1",
+  "version": "0.1.0",
   "engines": {
     "vscode": "^1.76.0"
   },

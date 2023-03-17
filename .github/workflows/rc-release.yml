@@ -17,6 +17,7 @@ jobs:
     - run:  npm i
     - run:  npm i -g vsce
     - run:  vsce package
-    - uses: actions/upload-artifact@v2
+    - uses: actions/upload-artifact@v3
       with:
+        name: 'tt151extpack'
         path: '*.vsix'
