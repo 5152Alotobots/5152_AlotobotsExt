@@ -76,6 +76,16 @@ jobs:
           path: ./tt151extpack-*.vsix
           if: success()
 
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./tt151extpack-*.vsix
+          asset_name: tt151extpack.vsix
+          asset_content_type: application/vsix
+          
       - name: Set output version
         id: version
         run: echo ::set-output name=version::${{ steps.determine_version.outputs.version }}
