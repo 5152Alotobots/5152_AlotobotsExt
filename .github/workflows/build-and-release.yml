@@ -61,8 +61,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ env.VERSION }}
+          release_name: Release ${{ env.VERSION }}
           body: |
             Changes in this release:
             - Add a summary of the changes in your release
@@ -85,7 +85,7 @@ jobs:
           asset_path: ./tt151extpack-*.vsix
           asset_name: tt151extpack.vsix
           asset_content_type: application/vsix
-          
+
       - name: Set output version
         id: version
         run: echo ::set-output name=version::${{ steps.determine_version.outputs.version }}
@@ -97,3 +97,109 @@ jobs:
       - name: Set output asset_id
         id: asset_id
         run: echo ::set-output name=asset_id::$(jq -r '.id' ${{ steps.create_release.outputs.upload_url }}/assets)
+
+
+
+
+
+
+      # - name: Get current tag
+      #   id: current_tag
+      #   run: echo ::set-output name=tag::$(git describe --abbrev=0 --tags)
+
+      # - name: Get current version
+      #   id: current_version
+      #   run: echo ::set-output name=version::$(node -pe "require('./package.json').version")
+
+      # - name: Determine release type
+      #   id: release_type
+      #   run: |
+      #     if [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/heads/main" ]]; then
+      #       echo "release"
+      #     elif [[ "${{ github.event_name }}" == "push" && "${{ github.ref }}" == "refs/tags/beta*" ]]; then
+      #       echo "beta"
+      #     else
+      #       echo "prerelease"
+      #     fi
+      #   env:
+      #     GITHUB_REF: ${{ github.ref }}
+
+      # - name: Update package version
+      #   if: steps.release_type.outputs.release_type != 'prerelease'
+      #   run: |
+      #     if [[ "${{ steps.release_type.outputs.release_type }}" == "release" ]]; then
+      #       npm version patch -m "Bump version to %s [skip ci]"
+      #     elif [[ "${{ steps.release_type.outputs.release_type }}" == "beta" ]]; then
+      #       npm version premajor --preid=beta -m "Bump version to %s [skip ci]"
+      #     fi
+      #   env:
+      #     GITHUB_REF: ${{ github.ref }}
+
+      # - name: Build extension
+      #   run: npm run build --if-present
+
+      # - name: Create release
+      #   if: steps.release_type.outputs.release_type != 'prerelease'
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: v${{ steps.current_version.outputs.version }}
+      #     release_name: Release ${{ steps.current_version.outputs.version }}
+      #     body: |
+      #       $(cat Changelog)
+      #     draft: false
+      #     prerelease: ${{ steps.release_type.outputs.release_type == 'beta' }}
+
+      # - name: Upload extension
+      #   if: steps.release_type.outputs.release_type != 'prerelease'
+      #   uses: actions/upload
+
+
+
+
+
+
+      # - name: Determine version
+      #   id: version
+      #   run: |
+      #     echo "##[set-output name=major;]$(node -p "require('./package.json').version.split('.')[0]")"
+      #     echo "##[set-output name=minor;]$(node -p "require('./package.json').version.split('.')[1]")"
+      #     echo "##[set-output name=micro;]$(node -p "require('./package.json').version.split('.')[2]")"
+      #     echo "##[set-output name=is_prerelease;]$(echo ${{ github.ref }} | grep -q -e 'beta' && echo true || echo false)"
+
+      # - name: Build extension
+      #   run: vsce package
+
+      # - name: Create release
+      #   id: create_release
+      #   uses: actions/create-release@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     tag_name: ${{ github.ref }}
+      #     release_name: Release ${{ github.ref }}
+      #     body: |
+      #       $(cat Changelog)
+      #     draft: false
+      #     prerelease: ${{ steps.version.outputs.is_prerelease }}
+
+      # - name: Upload asset
+      #   uses: actions/upload-release-asset@v1
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #   with:
+      #     upload_url: ${{ steps.create_release.outputs.upload_url }}
+      #     asset_path: ./tt151extpack-*.vsix
+      #     asset_name: tt151extpack-${{ github.ref }}.vsix
+      #     asset_content_type: application/vsix
+
+      # - name: Update package.json
+      #   if: steps.version.outputs.is_prerelease == 'false'
+      #   run: |
+      #     echo "{\"version\":\"${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.$(((${{ steps.version.outputs.micro }})+1))\"}" > package.json
+      #     git config user.name "GitHub Action"
+      #     git config user.email "github-action@github.com"
+      #     git add package.json
+      #     git commit -m "Bump version to ${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}.$(((${{ steps.version.outputs.micro }})+1)) for release"
+      #     git push origin HEAD:${{ github.ref }}
