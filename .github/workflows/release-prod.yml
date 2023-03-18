@@ -64,17 +64,17 @@ jobs:
       #   run: npx @vscode/vsce publish --packagePath `ls ./*.vsix`
       # - name: Summarize job
       #   run: echo Visual Studio Code extension published to https://marketplace.visualstudio.com/items?itemName=${{ steps.read-package-json.outputs.publisher }}.${{ steps.read-package-json.outputs.name }}. >> $GITHUB_STEP_SUMMARY
-  # publish-release:
-  #   needs:
-  #     - build
-  #     - publish-package
-  #   permissions:
-  #     contents: write
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Publish release
-  #       run: gh release edit ${{ github.ref_name }} --draft=false --repo ${{ github.repository }}
-  #       env:
-  #         GH_TOKEN: ${{ github.token }}
-  #     - name: Summarize job
-  #       run: echo GitHub release created at https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}. >> $GITHUB_STEP_SUMMARY
+  publish-release:
+    needs:
+      - build
+      - publish-package
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish release
+        run: gh release edit ${{ github.ref_name }} --draft=false --repo ${{ github.repository }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+      - name: Summarize job
+        run: echo GitHub release created at https://github.com/${{ github.repository }}/releases/tag/${{ github.ref_name }}. >> $GITHUB_STEP_SUMMARY
