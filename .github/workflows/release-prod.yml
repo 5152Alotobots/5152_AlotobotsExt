@@ -19,6 +19,7 @@ jobs:
           node-version: 16
       - name: install node dependencies
         run:  npm i
+      - name: install vsce
         run:  npm i -g vsce
       - name: create package
         run:  vsce package
