@@ -33,8 +33,9 @@ jobs:
           name: package
           path: ./*.vsix
       - name: Draft a new release
-        run: echo gh release create ${{ github.ref_name }} ./*.vsix --draft --notes-file ./CHANGELOG.md
-        run: gh release create ${{ github.ref_name }} ./*.vsix --draft --notes-file ./CHANGELOG.md
+        run: |
+          echo gh release create ${{ github.ref_name }} ./*.vsix --draft --notes-file ./CHANGELOG.md
+          gh release create ${{ github.ref_name }} ./*.vsix --draft --notes-file ./CHANGELOG.md
         env:
           GH_TOKEN: ${{ github.token }}
   publish-package:
