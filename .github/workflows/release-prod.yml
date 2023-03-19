@@ -58,12 +58,12 @@ jobs:
         run: |
           echo ::error::Cannot publish prerelease version ${{ steps.read-package-json.outputs.version }}
           exit 1
-      # - env:
-      #     VSCE_PAT: ${{ secrets.VSCE_PAT }}
-      #   name: Publish
-      #   run: npx @vscode/vsce publish --packagePath `ls ./*.vsix`
-      # - name: Summarize job
-      #   run: echo Visual Studio Code extension published to https://marketplace.visualstudio.com/items?itemName=${{ steps.read-package-json.outputs.publisher }}.${{ steps.read-package-json.outputs.name }}. >> $GITHUB_STEP_SUMMARY
+      - env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
+        name: Publish
+        run: npx @vscode/vsce publish --packagePath `ls ./*.vsix`
+      - name: Summarize job
+        run: echo Visual Studio Code extension published to https://marketplace.visualstudio.com/items?itemName=${{ steps.read-package-json.outputs.publisher }}.${{ steps.read-package-json.outputs.name }}. >> $GITHUB_STEP_SUMMARY
   publish-release:
     needs:
       - build
