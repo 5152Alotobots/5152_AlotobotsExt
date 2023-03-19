@@ -32,3 +32,7 @@ Once the extensions are installed, there are some further configuration changes 
 ## Donations
 
 [Please feel free to make a donation to our team.](https://nhs-tough-tech-151-boosters.square.site/)
+
+## Marketplace
+
+Find this extension on the [Marketplace.](https://marketplace.visualstudio.com/items?itemName=ToughTechs151.tt151extpack)
