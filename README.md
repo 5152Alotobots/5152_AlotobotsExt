@@ -19,6 +19,7 @@ Without further ado, here are the extension included in this pack:
 * [Code Spell Checker](https://marketplace.visualstudio.com/items?itemName=streetsidesoftware.code-spell-checker)
 * [Git Extension Pack](https://marketplace.visualstudio.com/items?itemName=donjayamanne.git-extension-pack)
 * [Git Graph](https://marketplace.visualstudio.com/items?itemName=mhutchie.git-graph)
+* [Github Actions](https://marketplace.visualstudio.com/items?itemName=github.vscode-github-actions)
 * [GitHub Pull Requests and Issues](https://marketplace.visualstudio.com/items?itemName=GitHub.vscode-pull-request-github)
 * [IntelliCode](https://marketplace.visualstudio.com/items?itemName=VisualStudioExptTeam.vscodeintellicode)
 * [SonarLint](https://marketplace.visualstudio.com/items?itemName=SonarSource.sonarlint-vscode)
