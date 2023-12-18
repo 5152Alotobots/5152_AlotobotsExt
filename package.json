@@ -4,7 +4,7 @@
   "description": "VSCode extensions needed to use the robot-template",
   "publisher": "Alotobots5152",
   "license": "MIT",
-  "icon": "icon.png",
+  "icon": "Alotobots.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/5152Alotobots/5152_AlotobotsExt.git"
@@ -36,6 +36,7 @@
     "VisualStudioExptTeam.vscodeintellicode",
     "SonarSource.sonarlint-vscode",
     "spencerwmiles.vscode-task-buttons",
-    "spmeesseman.vscode-taskexplorer"
+    "spmeesseman.vscode-taskexplorer",
+    "aaron-bond.better-comments"
   ]
 }
