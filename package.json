@@ -1,19 +1,15 @@
 {
-  "name": "tt151extpack",
-  "displayName": "FIRST Robotics Team 151 Extension Pack",
+  "name": "alotobotspack",
+  "displayName": "FIRST Robotics Team 5152 Extension Pack",
   "description": "VSCode extensions needed to use the robot-template",
-  "publisher": "ToughTechs151",
-  "author": {
-    "name": "Brian Utterback",
-    "email": "brian@utterback.org"
-  },
+  "publisher": "Alotobots5152",
   "license": "MIT",
   "icon": "icon.png",
   "repository": {
     "type": "git",
-    "url": "https://github.com/ToughTechs151/tt151extpack"
+    "url": "https://github.com/5152Alotobots/5152_AlotobotsExt.git"
   },
-  "version": "1.2.0",
+  "version": "1.0.0",
   "engines": {
     "vscode": "^1.76.0"
   },
@@ -23,8 +19,9 @@
   "keywords": [
     "FIRST",
     "frc",
-    "ToughTechs",
-    "frc151",
+    "Alotobots",
+    "frc5152",
+    "5152",
     "robot-template",
     "robotics"
   ],
